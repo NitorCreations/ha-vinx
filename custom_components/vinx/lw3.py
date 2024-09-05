@@ -1,8 +1,8 @@
 import asyncio
 import re
+
 from asyncio import StreamReader, StreamWriter
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -33,8 +33,8 @@ class LW3:
         self._hostname = hostname
         self._port = port
         self._timeout = timeout
-        self._reader: Optional[StreamReader] = None
-        self._writer: Optional[StreamWriter] = None
+        self._reader: StreamReader | None = None
+        self._writer: StreamWriter | None = None
         self._semaphore = asyncio.Semaphore()
 
     async def _read_until(self, phrase: str) -> str | None:
@@ -52,22 +52,22 @@ class LW3:
 
     @staticmethod
     def _is_error_response(response: str) -> bool:
-        return response[1] == 'E'
+        return response[1] == "E"
 
     @staticmethod
     def parse_response(response: str) -> PropertyResponse | ErrorResponse:
         if LW3._is_error_response(response):
-            matches = re.search(r'^(.E) (.*) %(E[0-9]+):(.*)$', response)
+            matches = re.search(r"^(.E) (.*) %(E[0-9]+):(.*)$", response)
             return ErrorResponse(matches.group(1), matches.group(2), matches.group(3), matches.group(4))
 
-        matches = re.fullmatch(r'^(.*) (.*)=(.*)$', response)
+        matches = re.fullmatch(r"^(.*) (.*)=(.*)$", response)
         return PropertyResponse(matches.group(1), matches.group(2), matches.group(3))
 
     async def _read_and_parse_response(self) -> PropertyResponse:
-        response = (await self._read_until("\r\n"))
+        response = await self._read_until("\r\n")
 
         if response is None:
-            raise EOFError('Reached EOF while reading, connection probably lost')
+            raise EOFError("Reached EOF while reading, connection probably lost")
 
         result = self.parse_response(response.strip())
 
