@@ -50,6 +50,10 @@ class LW3:
     async def connect(self):
         self._reader, self._writer = await asyncio.open_connection(self._hostname, self._port)
 
+    async def disconnect(self):
+        self._writer.close()
+        await self._writer.wait_closed()
+
     @staticmethod
     def _is_error_response(response: str) -> bool:
         return response[1] == "E"
@@ -95,12 +99,3 @@ class LW3:
 
     async def set_property(self, path: str, value: str) -> PropertyResponse:
         return await asyncio.wait_for(self._run_set_property(path, value), self._timeout)
-
-    async def get_product_name(self):
-        return str(await self._run_get_property("/.ProductName"))
-
-    async def get_serial_number(self):
-        return str(await self._run_get_property("/.SerialNumber"))
-
-    async def get_mac_address(self):
-        return str(await self._run_get_property("/.MacAddress"))
