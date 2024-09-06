@@ -50,6 +50,10 @@ class LW3:
     async def connect(self):
         self._reader, self._writer = await asyncio.open_connection(self._hostname, self._port)
 
+    async def disconnect(self):
+        self._writer.close()
+        await self._writer.wait_closed()
+
     @staticmethod
     def _is_error_response(response: str) -> bool:
         return response[1] == "E"
