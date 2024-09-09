@@ -31,13 +31,14 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
     async with lw3.connection():
         mac_address = str(await lw3.get_property("/.MacAddress"))
         product_name = str(await lw3.get_property("/.ProductName"))
+        device_label = str(await lw3.get_property("/SYS/MB.DeviceLabel"))
         firmware_version = str(await lw3.get_property("/.FirmwareVersion"))
         serial_number = str(await lw3.get_property("/.SerialNumber"))
         ip_address = str(await lw3.get_property("/MANAGEMENT/NETWORK.IpAddress"))
 
         device_info = DeviceInfo(
             identifiers={(DOMAIN, format_mac(mac_address))},
-            name=product_name,
+            name=f"{device_label} ({product_name})",
             manufacturer="Lightware",
             model=product_name,
             sw_version=firmware_version,
