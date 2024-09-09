@@ -33,6 +33,7 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
         product_name = str(await lw3.get_property("/.ProductName"))
         firmware_version = str(await lw3.get_property("/.FirmwareVersion"))
         serial_number = str(await lw3.get_property("/.SerialNumber"))
+        ip_address = str(await lw3.get_property("/MANAGEMENT/NETWORK.IpAddress"))
 
         device_info = DeviceInfo(
             identifiers={(DOMAIN, format_mac(mac_address))},
@@ -41,6 +42,7 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
             model=product_name,
             sw_version=firmware_version,
             serial_number=serial_number,
+            configuration_url=f"http://{ip_address}/",
         )
 
         return DeviceInformation(mac_address, product_name, device_info)
