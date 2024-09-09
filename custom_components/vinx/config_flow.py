@@ -32,7 +32,7 @@ class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
 
                 # Disconnect, this was just for validation
                 await lw3_device.disconnect()
-            except (ConnectionError, OSError):
+            except (BrokenPipeError, ConnectionError, OSError):  # all technically OSError
                 errors["base"] = "cannot_connect"
             else:
                 return self.async_create_entry(title=title, data=user_input)
