@@ -57,11 +57,11 @@ class AbstractVinxDevice(MediaPlayerEntity):
 
 
 class VinxEncoder(AbstractVinxDevice):
+    pass
+
+
+class VinxDecoder(AbstractVinxDevice):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
         super().__init__(lw3, device_information)
 
         _attr_supported_features = MediaPlayerEntityFeature.SELECT_SOURCE
-
-
-class VinxDecoder(AbstractVinxDevice):
-    pass
