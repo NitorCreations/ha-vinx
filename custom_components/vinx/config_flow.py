@@ -8,16 +8,18 @@ from homeassistant.helpers.device_registry import format_mac
 from .const import CONF_HOST, CONF_PORT, DOMAIN
 from .lw3 import LW3
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_HOST): str,
-        vol.Required(CONF_PORT, default=6107): int,
-    }
-)
-
 
 class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+
+    @property
+    def schema(self):
+        return vol.Schema(
+            {
+                vol.Required(CONF_HOST): str,
+                vol.Required(CONF_PORT, default=6107): int,
+            }
+        )
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle user initiated configuration"""
@@ -44,4 +46,4 @@ class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
             else:
                 return self.async_create_entry(title=title, data=user_input)
 
-        return self.async_show_form(step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors)
+        return self.async_show_form(step_id="user", data_schema=self.schema, errors=errors)
