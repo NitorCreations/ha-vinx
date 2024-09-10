@@ -173,6 +173,13 @@ class LW3:
 
             return await self._read_and_parse_response()
 
+    async def _run_call(self, path: str, method: str) -> Response:
+        async with self._semaphore:
+            self._writer.write(f"0000#CALL {path}:{method}\r\n".encode())
+            await self._writer.drain()
+
+            return await self._read_and_parse_response()
+
     async def get_property(self, path: str) -> PropertyResponse:
         response = await asyncio.wait_for(self._run_get(path), self._timeout)
 
@@ -191,6 +198,14 @@ class LW3:
 
     async def get_all(self, path: str) -> Response:
         return await asyncio.wait_for(self._run_get_all(path), self._timeout)
+
+    async def call(self, path: str, method: str) -> MethodResponse:
+        response = await asyncio.wait_for(self._run_call(path, method), self._timeout)
+
+        if not isinstance(response, MethodResponse):
+            raise ValueError(f"Called method {path}:{method} does not return a method response")
+
+        return response
 
 
 class LW3ConnectionContext:
