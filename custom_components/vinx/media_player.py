@@ -25,7 +25,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         _LOGGER.warning("Unknown device type, no entities will be added")
 
 
-class AbstractVinxDevice(MediaPlayerEntity):
+class AbstractVinxMediaPlayerEntity(MediaPlayerEntity):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
         self._lw3 = lw3
         self._device_information = device_information
@@ -65,11 +65,11 @@ class AbstractVinxDevice(MediaPlayerEntity):
             return "VINX media player"
 
 
-class VinxEncoder(AbstractVinxDevice):
+class VinxEncoder(AbstractVinxMediaPlayerEntity):
     pass
 
 
-class VinxDecoder(AbstractVinxDevice):
+class VinxDecoder(AbstractVinxMediaPlayerEntity):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
         super().__init__(lw3, device_information)
 
