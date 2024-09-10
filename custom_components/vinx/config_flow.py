@@ -12,12 +12,17 @@ from .lw3 import LW3
 class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
+    def __init__(self):
+        # Potentially prepopulated values (e.g. during auto-discovery)
+        self.host: str | None = None
+        self.port: int = 6107
+
     @property
     def schema(self):
         return vol.Schema(
             {
-                vol.Required(CONF_HOST): str,
-                vol.Required(CONF_PORT, default=6107): int,
+                vol.Required(CONF_HOST, default=self.host): str,
+                vol.Required(CONF_PORT, default=self.port): int,
             }
         )
 
