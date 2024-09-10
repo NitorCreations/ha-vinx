@@ -49,7 +49,10 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up from a config entry."""
-    lw3 = LW3(entry.data["host"], entry.data["port"])
+    if "host" in entry.data and "port" in entry.data:
+        lw3 = LW3(entry.data["host"], entry.data["port"])
+    else:
+        raise KeyError("Config entry is missing required parameters")
 
     try:
         # Store runtime information
