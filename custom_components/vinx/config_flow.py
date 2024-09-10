@@ -1,12 +1,17 @@
+import logging
+
 from typing import Any
 
 import voluptuous as vol
 
+from homeassistant.components.zeroconf import ZeroconfServiceInfo
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.helpers.device_registry import format_mac
 
 from .const import CONF_HOST, CONF_PORT, DOMAIN
 from .lw3 import LW3
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -52,3 +57,18 @@ class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=title, data=user_input)
 
         return self.async_show_form(step_id="user", data_schema=self.schema, errors=errors)
+
+    async def async_step_zeroconf(self, discovery_info: ZeroconfServiceInfo) -> ConfigFlowResult:
+        _LOGGER.info(f"Zeroconf discovery info: {discovery_info}")
+
+        # Abort if the device is already configured
+        unique_id = format_mac(discovery_info.properties.get("mac"))
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
+
+        # Pre-populate the form
+        self.host = discovery_info.ip_address
+        self.port = discovery_info.port
+
+        # Trigger the user configuration flow
+        return await self.async_step_user()
