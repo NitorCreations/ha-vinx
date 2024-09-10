@@ -68,7 +68,11 @@ class AbstractVinxMediaPlayerEntity(MediaPlayerEntity):
 
 
 class VinxEncoder(AbstractVinxMediaPlayerEntity):
-    pass
+    async def async_update(self):
+        async with self._lw3.connection():
+            # Query signal status
+            signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
+            self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
 
 
 class VinxDecoder(AbstractVinxMediaPlayerEntity):
@@ -89,8 +93,13 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
             _LOGGER.info(f"{self.name} source list populated with {len(self._source_list)} sources")
 
         async with self._lw3.connection():
+            # Query current source
             video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
             self._source = str(self._source_bidict.get(str(video_channel_id)))
+
+            # Query signal status
+            signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
+            self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
 
     @property
     def source(self) -> str | None:
