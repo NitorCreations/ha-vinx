@@ -53,7 +53,16 @@ class AbstractVinxDevice(MediaPlayerEntity):
 
     @property
     def name(self):
-        return "Media Player"
+        # Use increasingly less descriptive names depending on what information is available
+        device_label = self._device_information.device_label
+        serial_number = self._device_information.device_info.get("serial_number")
+
+        if device_label:
+            return f"{self._device_information.device_label} media player"
+        elif serial_number:
+            return f"VINX {serial_number} media player"
+        else:
+            return "VINX media player"
 
 
 class VinxEncoder(AbstractVinxDevice):

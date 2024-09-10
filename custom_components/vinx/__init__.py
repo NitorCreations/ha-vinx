@@ -16,6 +16,7 @@ PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
 class DeviceInformation:
     mac_address: str
     product_name: str
+    device_label: str
     device_info: DeviceInfo
 
 
@@ -44,7 +45,7 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
             configuration_url=f"http://{ip_address}/",
         )
 
-        return DeviceInformation(mac_address, product_name, device_info)
+        return DeviceInformation(mac_address, product_name, device_label, device_info)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
