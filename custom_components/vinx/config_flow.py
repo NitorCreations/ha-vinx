@@ -23,16 +23,14 @@ class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             try:
-                # Try to connect to the device
-                lw3_device = LW3(user_input["host"], user_input["port"])
-                await lw3_device.connect()
+                # Query the device for enough information to make an entry title
+                lw3 = LW3(user_input["host"], user_input["port"])
+                async with lw3.connection():
+                    product_name = await lw3.get_property("/.ProductName")
+                    device_label = await lw3.get_property("/SYS/MB.DeviceLabel")
 
-                # Make a title for the entry
-                title = str(await lw3_device.get_property("/.ProductName"))
-
-                # Disconnect, this was just for validation
-                await lw3_device.disconnect()
-            except (ConnectionError, OSError):
+                    title = f"{device_label} ({product_name})"
+            except (BrokenPipeError, ConnectionError, OSError):  # all technically OSError
                 errors["base"] = "cannot_connect"
             else:
                 return self.async_create_entry(title=title, data=user_input)

@@ -47,10 +47,13 @@ class LW3:
             if b.endswith(phrase.encode()):
                 return b.decode()
 
-    async def connect(self):
+    def connection(self):
+        return LW3ConnectionContext(self)
+
+    async def _connect(self):
         self._reader, self._writer = await asyncio.open_connection(self._hostname, self._port)
 
-    async def disconnect(self):
+    async def _disconnect(self):
         self._writer.close()
         await self._writer.wait_closed()
 
@@ -99,3 +102,14 @@ class LW3:
 
     async def set_property(self, path: str, value: str) -> PropertyResponse:
         return await asyncio.wait_for(self._run_set_property(path, value), self._timeout)
+
+
+class LW3ConnectionContext:
+    def __init__(self, lw3: LW3):
+        self._lw3 = lw3
+
+    async def __aenter__(self):
+        await self._lw3._connect()
+
+    async def __aexit__(self, *args):
+        await self._lw3._disconnect()
