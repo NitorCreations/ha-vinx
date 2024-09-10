@@ -1,11 +1,11 @@
-name: Ruff
+name: Python
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  ruff:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
