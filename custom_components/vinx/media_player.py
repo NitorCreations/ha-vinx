@@ -88,6 +88,10 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
             self._source_list = sorted(list(self._source_bidict.values()))
             _LOGGER.info(f"{self.name} source list populated with {len(self._source_list)} sources")
 
+        async with self._lw3.connection():
+            video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
+            self._source = str(self._source_bidict.get(str(video_channel_id)))
+
     @property
     def source(self) -> str | None:
         return self._source
@@ -95,6 +99,13 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
     @property
     def source_list(self) -> list[str] | None:
         return self._source_list
+
+    async def async_select_source(self, source: str) -> None:
+        self._source = source
+        video_channel_id = self._source_bidict.inverse.get(source)
+
+        async with self._lw3.connection():
+            await self._lw3.set_property("/SYS/MB/PHY.VideoChannelId", video_channel_id)
 
     async def populate_source_bidict(self):
         """Queries the device for discovered devices, filters out everything that isn't a VINX encoder,
