@@ -7,6 +7,8 @@ from custom_components.vinx.lw3 import (
     PropertyResponse,
     ResponseType,
     get_response_type,
+    is_decoder_discovery_node,
+    is_encoder_discovery_node,
     parse_response,
     parse_single_line_response,
 )
@@ -85,3 +87,13 @@ pr /.CoreVersion=v3.2.2b1 r1\r
         self.assertEqual("pr", last.prefix)
         self.assertEqual("/.CoreVersion", last.path)
         self.assertEqual("v3.2.2b1 r1", last.value)
+
+
+class TestDiscoveryNodes(TestCase):
+    def test_is_discovery_node(self):
+        encoder_node = NodeResponse("n-", "/DISCOVERY/TXE00143")
+        decoder_node = NodeResponse("n-", "/DISCOVERY/RXE8011D")
+        self.assertTrue(is_encoder_discovery_node(encoder_node))
+        self.assertFalse(is_encoder_discovery_node(decoder_node))
+        self.assertTrue(is_decoder_discovery_node(decoder_node))
+        self.assertFalse(is_decoder_discovery_node(encoder_node))

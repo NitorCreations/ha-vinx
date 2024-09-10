@@ -1,9 +1,11 @@
 import logging
 
+from bidict import bidict
 from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerEntityFeature, MediaPlayerState
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from custom_components.vinx import LW3, DeviceInformation, VinxRuntimeData
+from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,5 +74,36 @@ class VinxEncoder(AbstractVinxMediaPlayerEntity):
 class VinxDecoder(AbstractVinxMediaPlayerEntity):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
         super().__init__(lw3, device_information)
+        self._source = None
+        self._source_list = None
+        self._source_bidict = bidict()
 
     _attr_supported_features = MediaPlayerEntityFeature.SELECT_SOURCE
+
+    async def async_update(self):
+        # Populate the source list only once. Sort it alphabetically, since the order of discovered devices
+        # may differ from device to device.
+        if self._source_list is None:
+            await self.populate_source_bidict()
+            self._source_list = sorted(list(self._source_bidict.values()))
+            _LOGGER.info(f"{self.name} source list populated with {len(self._source_list)} sources")
+
+    @property
+    def source(self) -> str | None:
+        return self._source
+
+    @property
+    def source_list(self) -> list[str] | None:
+        return self._source_list
+
+    async def populate_source_bidict(self):
+        """Queries the device for discovered devices, filters out everything that isn't a VINX encoder,
+        then builds a bidict mapping between the device label and video channel ID."""
+        async with self._lw3.connection():
+            discovery_nodes = await self._lw3.get_all("/DISCOVERY")
+            encoder_nodes: list[NodeResponse] = list(filter(is_encoder_discovery_node, discovery_nodes))
+
+            for encoder_node in encoder_nodes:
+                device_name = await self._lw3.get_property(f"{encoder_node.path}.DeviceName")
+                video_channel_id = await self._lw3.get_property(f"{encoder_node.path}.VideoChannelId")
+                self._source_bidict.put(str(video_channel_id), str(device_name))

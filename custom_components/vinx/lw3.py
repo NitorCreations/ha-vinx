@@ -101,6 +101,14 @@ def parse_response(response: str) -> Response:
         return parse_multiline_response(lines[1 : len(lines) - 1])
 
 
+def is_encoder_discovery_node(node: Response) -> bool:
+    return isinstance(node, NodeResponse) and "TX" in node.path
+
+
+def is_decoder_discovery_node(node: Response) -> bool:
+    return isinstance(node, NodeResponse) and "RX" in node.path
+
+
 class LW3:
     def __init__(self, hostname: str, port: int, timeout: int = 5):
         self._hostname = hostname
