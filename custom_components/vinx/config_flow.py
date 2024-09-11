@@ -67,8 +67,8 @@ class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
 
         # Pre-populate the form
-        self.host = discovery_info.ip_address
-        self.port = discovery_info.port
+        self.host = str(discovery_info.ip_address)
+        self.port = int(discovery_info.port)
 
         # Trigger the user configuration flow
         return await self.async_step_user()
