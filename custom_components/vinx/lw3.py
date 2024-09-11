@@ -93,7 +93,7 @@ def parse_response(response: str) -> Response:
     if len(lines) == 3:
         return parse_single_line_response(lines[1])
     else:
-        return parse_multiline_response(lines[1 : len(lines) - 1])
+        return parse_multiline_response(lines[1:-1])
 
 
 def is_encoder_discovery_node(node: Response) -> bool:
