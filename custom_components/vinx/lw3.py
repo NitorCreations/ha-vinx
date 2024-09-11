@@ -63,7 +63,7 @@ def get_response_type(response: str) -> ResponseType:
     elif response[0] == "m":
         return ResponseType.Method
 
-    raise ValueError("Unknown response type")
+    raise ValueError(f"Unknown response type: {response}")
 
 
 def parse_single_line_response(response: str) -> SingleLineResponse:
