@@ -9,7 +9,7 @@ from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from custom_components.vinx.const import DOMAIN
 from custom_components.vinx.lw3 import LW3
 
-PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER]
+PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER, Platform.BUTTON]
 
 
 @dataclass

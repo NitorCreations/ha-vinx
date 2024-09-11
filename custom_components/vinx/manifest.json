@@ -11,7 +11,7 @@
   "documentation": "https://www.home-assistant.io/integrations/vinx",
   "homekit": {},
   "iot_class": "local_polling",
-  "requirements": [],
+  "requirements": ["bidict"],
   "ssdp": [],
   "zeroconf": ["_lwr3._tcp.local."]
 }
