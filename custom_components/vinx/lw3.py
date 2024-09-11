@@ -83,12 +83,7 @@ def parse_single_line_response(response: str) -> SingleLineResponse:
 
 
 def parse_multiline_response(lines: list[str]) -> MultiLineResponse:
-    responses = []
-
-    for response in lines:
-        responses.append(parse_single_line_response(response))
-
-    return responses
+    return [parse_single_line_response(response) for response in lines]
 
 
 def parse_response(response: str) -> Response:
