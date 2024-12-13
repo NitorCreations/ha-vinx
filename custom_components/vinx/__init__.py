@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -12,12 +13,26 @@ from custom_components.vinx.lw3 import LW3
 PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER, Platform.BUTTON]
 
 
+class DeviceType(Enum):
+    ENCODER = "encoder"
+    DECODER = "decoder"
+    UNKNOWN = "unknown"
+
+
 @dataclass
 class DeviceInformation:
     mac_address: str
     product_name: str
     device_label: str
     device_info: DeviceInfo
+
+    def get_device_type(self) -> DeviceType:
+        if self.product_name.endswith("ENC"):
+            return DeviceType.ENCODER
+        elif self.product_name.endswith("DEC"):
+            return DeviceType.DECODER
+        else:
+            return DeviceType.UNKNOWN
 
 
 @dataclass

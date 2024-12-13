@@ -4,7 +4,7 @@ from bidict import bidict
 from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerEntityFeature, MediaPlayerState
 from homeassistant.helpers.device_registry import DeviceInfo
 
-from custom_components.vinx import LW3, DeviceInformation, VinxRuntimeData
+from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxRuntimeData
 from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
 _LOGGER = logging.getLogger(__name__)
@@ -16,11 +16,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
     _LOGGER.info(f"Runtime data: {runtime_data}")
 
     # Add entity to Home Assistant
-    product_name = runtime_data.device_information.product_name
-    if product_name.endswith("ENC"):
+    device_type = runtime_data.device_information.get_device_type()
+    if device_type == DeviceType.ENCODER:
         async_add_entities([VinxEncoder(runtime_data.lw3, runtime_data.device_information)])
         pass
-    elif product_name.endswith("DEC"):
+    elif device_type == DeviceType.DECODER:
         async_add_entities([VinxDecoder(runtime_data.lw3, runtime_data.device_information)])
         pass
     else:
