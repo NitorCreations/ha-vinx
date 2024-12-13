@@ -21,6 +21,7 @@ class DeviceType(Enum):
 
 @dataclass
 class DeviceInformation:
+    ip_address: str
     mac_address: str
     product_name: str
     device_label: str
@@ -60,7 +61,7 @@ async def get_device_information(lw3: LW3) -> DeviceInformation:
             configuration_url=f"http://{ip_address}/",
         )
 
-        return DeviceInformation(mac_address, product_name, device_label, device_info)
+        return DeviceInformation(ip_address, mac_address, product_name, device_label, device_info)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
