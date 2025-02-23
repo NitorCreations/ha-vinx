@@ -81,6 +81,8 @@ def parse_single_line_response(response: str) -> SingleLineResponse:
             matches = re.fullmatch(r"^m(.*) (.*):(.*)$", response)
             return MethodResponse(f"m{matches.group(1)}", matches.group(2), matches.group(3))
 
+    raise ValueError(f"Unable to parse response: {response}")
+
 
 def parse_multiline_response(lines: list[str]) -> MultiLineResponse:
     return [parse_single_line_response(response) for response in lines]
