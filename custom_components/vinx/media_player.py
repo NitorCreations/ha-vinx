@@ -1,7 +1,12 @@
 import logging
 
 from bidict import bidict
-from homeassistant.components.media_player import MediaPlayerEntity, MediaPlayerEntityFeature, MediaPlayerState
+from homeassistant.components.media_player import (
+    MediaPlayerDeviceClass,
+    MediaPlayerEntity,
+    MediaPlayerEntityFeature,
+    MediaPlayerState,
+)
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from custom_components.vinx import LW3, DeviceInformation, VinxRuntimeData
@@ -32,12 +37,9 @@ class AbstractVinxMediaPlayerEntity(MediaPlayerEntity):
         self._lw3 = lw3
         self._device_information = device_information
 
-        self._device_class = "receiver"
         self._state = MediaPlayerState.IDLE
 
-    @property
-    def device_class(self):
-        return self._device_class
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
     @property
     def unique_id(self) -> str | None:
@@ -46,7 +48,7 @@ class AbstractVinxMediaPlayerEntity(MediaPlayerEntity):
         return f"vinx_{mac_address}_media_player"
 
     @property
-    def state(self):
+    def state(self) -> MediaPlayerState:
         return self._state
 
     @property
