@@ -81,18 +81,15 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
         super().__init__(lw3, device_information)
         self._source = None
-        self._source_list = None
         self._source_bidict = bidict()
 
     _attr_supported_features = MediaPlayerEntityFeature.SELECT_SOURCE
 
     async def async_update(self):
-        # Populate the source list only once. Sort it alphabetically, since the order of discovered devices
-        # may differ from device to device.
-        if self._source_list is None:
+        # Populate the source list only once
+        if len(self._source_bidict.items()) == 0:
             await self.populate_source_bidict()
-            self._source_list = sorted(list(self._source_bidict.values()))
-            _LOGGER.info(f"{self.name} source list populated with {len(self._source_list)} sources")
+            _LOGGER.info(f"{self.name} source list populated with {len(self.source_list)} sources")
 
         async with self._lw3.connection():
             # Query current source
@@ -109,7 +106,8 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
 
     @property
     def source_list(self) -> list[str] | None:
-        return self._source_list
+        # Sort the list alphabetically, since the order of discovered devices may differ from device to device.
+        return sorted(list(self._source_bidict.values()))
 
     async def async_select_source(self, source: str) -> None:
         self._source = source
