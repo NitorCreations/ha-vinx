@@ -7,9 +7,11 @@ from homeassistant.components.media_player import (
     MediaPlayerEntityFeature,
     MediaPlayerState,
 )
+from homeassistant.core import Event
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxRuntimeData
+from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
 from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,23 +84,9 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         super().__init__(lw3, device_information)
         self._source = None
         self._source_bidict = bidict()
+        self._updating_sources = False
 
     _attr_supported_features = MediaPlayerEntityFeature.SELECT_SOURCE
-
-    async def async_update(self):
-        # Populate the source list only once
-        if len(self._source_bidict.items()) == 0:
-            await self.populate_source_bidict()
-            _LOGGER.info(f"{self.name} source list populated with {len(self.source_list)} sources")
-
-        async with self._lw3.connection():
-            # Query current source
-            video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
-            self._source = str(self._source_bidict.get(str(video_channel_id)))
-
-            # Query signal status
-            signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
-            self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
 
     @property
     def source(self) -> str | None:
@@ -109,12 +97,44 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         # Sort the list alphabetically, since the order of discovered devices may differ from device to device.
         return sorted(list(self._source_bidict.values()))
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        # Re-populate the source list when EVENT_DISCOVER_DEVICES is fired
+        self.async_on_remove(self.hass.bus.async_listen(EVENT_DISCOVER_SOURCES, self.handle_discover_sources_event))
+
+    async def async_update(self):
+        # Populate the source list if its empty
+        if len(self._source_bidict.items()) == 0:
+            await self.populate_source_bidict()
+
+        async with self._lw3.connection():
+            # Query current source
+            video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
+            self._source = str(self._source_bidict.get(str(video_channel_id)))
+
+            # Query signal status
+            signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
+            self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
+
     async def async_select_source(self, source: str) -> None:
         self._source = source
         video_channel_id = self._source_bidict.inverse.get(source)
 
         async with self._lw3.connection():
             await self._lw3.set_property("/SYS/MB/PHY.VideoChannelId", video_channel_id)
+
+    async def handle_discover_sources_event(self, _event: Event) -> None:
+        # Protect against simultaneous calls
+        if not self._updating_sources:
+            try:
+                self._updating_sources = True
+
+                # Clear any existing items first
+                self._source_bidict.clear()
+                await self.populate_source_bidict()
+            finally:
+                self._updating_sources = False
 
     async def populate_source_bidict(self):
         """Queries the device for discovered devices, filters out everything that isn't a VINX encoder,
@@ -127,3 +147,5 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
                 device_name = await self._lw3.get_property(f"{encoder_node.path}.DeviceName")
                 video_channel_id = await self._lw3.get_property(f"{encoder_node.path}.VideoChannelId")
                 self._source_bidict.put(str(video_channel_id), str(device_name))
+
+        _LOGGER.info(f"{self.name} source list populated with {len(self.source_list)} sources")
