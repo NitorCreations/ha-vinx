@@ -14,6 +14,7 @@ from .lw3 import LW3
 _LOGGER = logging.getLogger(__name__)
 
 
+# noinspection PyTypeChecker
 class VinxConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
