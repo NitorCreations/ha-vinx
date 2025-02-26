@@ -8,9 +8,8 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
 )
 from homeassistant.core import Event
-from homeassistant.helpers.device_registry import DeviceInfo
 
-from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxRuntimeData
+from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
 from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
 from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
@@ -34,41 +33,18 @@ async def async_setup_entry(_hass, entry, async_add_entities):
         _LOGGER.warning("Unknown device type, no entities will be added")
 
 
-class AbstractVinxMediaPlayerEntity(MediaPlayerEntity):
+class AbstractVinxMediaPlayerEntity(VinxEntity, MediaPlayerEntity):
     def __init__(self, lw3: LW3, device_information: DeviceInformation) -> None:
+        super().__init__(device_information, "media player", "media_player")
         self._lw3 = lw3
-        self._device_information = device_information
 
         self._state = MediaPlayerState.IDLE
 
     _attr_device_class = MediaPlayerDeviceClass.RECEIVER
 
     @property
-    def unique_id(self) -> str | None:
-        mac_address = self._device_information.mac_address
-
-        return f"vinx_{mac_address}_media_player"
-
-    @property
     def state(self) -> MediaPlayerState:
         return self._state
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._device_information.device_info
-
-    @property
-    def name(self):
-        # Use increasingly less descriptive names depending on what information is available
-        device_label = self._device_information.device_label
-        serial_number = self._device_information.device_info.get("serial_number")
-
-        if device_label:
-            return f"{self._device_information.device_label} media player"
-        elif serial_number:
-            return f"VINX {serial_number} media player"
-        else:
-            return "VINX media player"
 
 
 class VinxEncoder(AbstractVinxMediaPlayerEntity):
