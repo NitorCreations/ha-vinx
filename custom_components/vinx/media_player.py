@@ -15,7 +15,7 @@ from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(_hass, entry, async_add_entities):
     # Extract stored runtime data
     runtime_data: VinxRuntimeData = entry.runtime_data
     _LOGGER.info(f"Runtime data: {runtime_data}")

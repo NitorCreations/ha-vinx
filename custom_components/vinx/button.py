@@ -9,7 +9,7 @@ from custom_components.vinx import LW3, DeviceInformation, VinxRuntimeData
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
+async def async_setup_entry(_hass, entry: ConfigEntry, async_add_entities):
     # Extract stored runtime data
     runtime_data: VinxRuntimeData = entry.runtime_data
     _LOGGER.info(f"Runtime data: {runtime_data}")
