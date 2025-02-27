@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from bidict import bidict
@@ -60,7 +61,7 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         super().__init__(lw3, device_information)
         self._source = None
         self._source_bidict = bidict()
-        self._updating_sources = False
+        self._update_sources_lock = asyncio.Lock()
 
     _attr_supported_features = MediaPlayerEntityFeature.SELECT_SOURCE
 
@@ -106,16 +107,12 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         if event_device_label is None or event_device_label != self._device_information.device_label:
             _LOGGER.debug(f"Discarding {EVENT_DISCOVER_SOURCES} event for device label {event_device_label}")
 
-        # Protect against simultaneous calls
-        if not self._updating_sources:
-            try:
-                self._updating_sources = True
-
+        # Ignore concurrent events
+        if not self._update_sources_lock.locked():
+            async with self._update_sources_lock:
                 # Clear any existing items first
                 self._source_bidict.clear()
                 await self.populate_source_bidict()
-            finally:
-                self._updating_sources = False
 
     async def populate_source_bidict(self):
         """Queries the device for discovered devices, filters out everything that isn't a VINX encoder,
