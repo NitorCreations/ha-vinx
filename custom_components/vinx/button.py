@@ -45,4 +45,12 @@ class VinxDiscoverSourcesButtonEntity(VinxEntity, ButtonEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_press(self) -> None:
-        self.hass.bus.async_fire(EVENT_DISCOVER_SOURCES)
+        self.hass.bus.async_fire(
+            EVENT_DISCOVER_SOURCES,
+            {
+                # The same event is sent to all event listeners, but we only want the decoder entity belonging to the
+                # same device as this button to handle the event, so send an identifier here that can be checked in the
+                # listener
+                "device_label": self._device_information.device_label,
+            },
+        )

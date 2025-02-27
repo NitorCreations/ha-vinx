@@ -100,7 +100,12 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         async with self._lw3.connection():
             await self._lw3.set_property("/SYS/MB/PHY.VideoChannelId", video_channel_id)
 
-    async def handle_discover_sources_event(self, _event: Event) -> None:
+    async def handle_discover_sources_event(self, event: Event) -> None:
+        # Discard the event if it's not meant for us
+        event_device_label = event.data.get("device_label")
+        if event_device_label is None or event_device_label != self._device_information.device_label:
+            _LOGGER.debug(f"Discarding {EVENT_DISCOVER_SOURCES} event for device label {event_device_label}")
+
         # Protect against simultaneous calls
         if not self._updating_sources:
             try:
