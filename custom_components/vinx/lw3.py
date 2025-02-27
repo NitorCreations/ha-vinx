@@ -205,12 +205,30 @@ class LW3:
         return response
 
 
+# noinspection PyProtectedMember
 class LW3ConnectionContext:
+    """
+    Connection context that provides exclusive access to the device. Should not be used for long-running operations
+    since that would block others from acquiring the context.
+    """
+
     def __init__(self, lw3: LW3):
         self._lw3 = lw3
+        self._lock = asyncio.Lock()
 
     async def __aenter__(self):
-        await self._lw3._connect()
+        await self._lock.acquire()
+
+        # Avoid deadlock if connect() fails
+        try:
+            await self._lw3._connect()
+        except:
+            self._lock.release()
+            raise
 
     async def __aexit__(self, *args):
-        await self._lw3._disconnect()
+        # Avoid deadlock if disconnect() fails
+        try:
+            await self._lw3._disconnect()
+        finally:
+            self._lock.release()
