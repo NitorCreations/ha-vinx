@@ -9,10 +9,10 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
 )
 from homeassistant.core import Event
+from pylw3 import LW3, NodeResponse, is_encoder_discovery_node
 
-from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
+from custom_components.vinx import DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
 from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
-from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
 _LOGGER = logging.getLogger(__name__)
 

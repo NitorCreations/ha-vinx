@@ -7,9 +7,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 from homeassistant.helpers.entity import Entity
+from pylw3 import LW3
 
 from custom_components.vinx.const import DOMAIN
-from custom_components.vinx.lw3 import LW3
 
 PLATFORMS: list[Platform] = [Platform.MEDIA_PLAYER, Platform.BUTTON]
 

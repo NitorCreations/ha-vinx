@@ -7,6 +7,27 @@
 
 Custom integration for controlling Lightware VINX encoders and decoders
 
+## Features
+
+* Auto-discovery of devices on the network
+* Auto-discovery of available sources for decoders
+
+The following entities are exposed:
+
+* media players for encoders and decoders
+* a button for rebooting devices
+* a button for triggering source auto-discovery
+
+## Development
+
+Install dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+Mount/symlink `custom_components/vinx` into a Home Assistant development environment.
+
 ## Tests
 
 ```bash
