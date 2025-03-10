@@ -20,10 +20,10 @@ The following entities are exposed:
 
 ## Development
 
-Install dependencies:
+Create a virtual environment, then install dependencies using:
 
 ```bash
-pip3 install -r requirements.txt
+pip install .
 ```
 
 Mount/symlink `custom_components/vinx` into a Home Assistant development environment.

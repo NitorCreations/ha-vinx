@@ -1,3 +1,0 @@
-homeassistant
-bidict
-pylw3 @ git+https://github.com/NitorCreations/pylw3@1562c6b

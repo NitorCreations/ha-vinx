@@ -13,7 +13,7 @@
   "iot_class": "local_polling",
   "requirements": [
     "bidict",
-    "pylw3 @ git+https://github.com/NitorCreations/pylw3@1562c6b"
+    "pylw3 @ git+https://github.com/NitorCreations/pylw3@779c55e"
   ],
   "ssdp": [],
   "zeroconf": ["_lwr3._tcp.local."]
