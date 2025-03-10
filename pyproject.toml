@@ -1,3 +1,17 @@
+[project]
+name = "ha-vinx"
+version = "0.1.2"
+description = "Home Assistant integration for controlling Lightware VINX encoders and decoders"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+dependencies = [
+    "homeassistant",
+    "bidict",
+    "pylw3 @ git+https://github.com/NitorCreations/pylw3.git@779c55e"
+]
+
+
 [tool.black]
 # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
 line-length = 120

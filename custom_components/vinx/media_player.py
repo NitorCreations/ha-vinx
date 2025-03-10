@@ -9,10 +9,10 @@ from homeassistant.components.media_player import (
     MediaPlayerState,
 )
 from homeassistant.core import Event
+from pylw3 import LW3, NodeResponse, is_encoder_discovery_node
 
-from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
+from custom_components.vinx import DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
 from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
-from custom_components.vinx.lw3 import NodeResponse, is_encoder_discovery_node
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -85,14 +85,19 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         if len(self._source_bidict.items()) == 0:
             await self.populate_source_bidict()
 
-        async with self._lw3.connection():
-            # Query current source
-            video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
-            self._source = str(self._source_bidict.get(str(video_channel_id)))
+        try:
+            async with self._lw3.connection():
+                # Query current source
+                video_channel_id = await self._lw3.get_property("/SYS/MB/PHY.VideoChannelId")
+                self._source = str(self._source_bidict.get(str(video_channel_id)))
 
-            # Query signal status
-            signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
-            self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
+                # Query signal status
+                signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
+                self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
+        except Exception:
+            self._attr_available = False
+        else:
+            self._attr_available = True
 
     async def async_select_source(self, source: str) -> None:
         self._source = source

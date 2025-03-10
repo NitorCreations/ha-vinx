@@ -7,9 +7,9 @@ import voluptuous as vol
 from homeassistant.components.zeroconf import ZeroconfServiceInfo
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.helpers.device_registry import format_mac
+from pylw3 import LW3
 
 from .const import CONF_HOST, CONF_PORT, DOMAIN
-from .lw3 import LW3
 
 _LOGGER = logging.getLogger(__name__)
 

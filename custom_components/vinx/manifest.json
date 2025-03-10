@@ -11,7 +11,10 @@
   "documentation": "https://www.home-assistant.io/integrations/vinx",
   "homekit": {},
   "iot_class": "local_polling",
-  "requirements": ["bidict"],
+  "requirements": [
+    "bidict",
+    "pylw3 @ git+https://github.com/NitorCreations/pylw3@779c55e"
+  ],
   "ssdp": [],
   "zeroconf": ["_lwr3._tcp.local."]
 }
