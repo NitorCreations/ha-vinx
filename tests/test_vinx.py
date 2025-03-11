@@ -2,7 +2,8 @@ import unittest
 
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
 
-from custom_components.vinx import DeviceInformation, VinxEntity
+from custom_components.vinx import DeviceInformation
+from custom_components.vinx.entity import VinxEntity
 
 
 class VinxEntityTests(unittest.TestCase):

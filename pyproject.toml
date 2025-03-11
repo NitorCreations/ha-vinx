@@ -8,7 +8,7 @@ requires-python = ">=3.12"
 dependencies = [
     "homeassistant",
     "bidict",
-    "pylw3 @ git+https://github.com/NitorCreations/pylw3.git@779c55e"
+    "pylw3 @ git+https://github.com/NitorCreations/pylw3.git@0.2.1"
 ]
 
 

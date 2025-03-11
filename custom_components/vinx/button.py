@@ -4,8 +4,9 @@ from homeassistant.components.button import ButtonDeviceClass, ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 
-from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxEntity, VinxRuntimeData
+from custom_components.vinx import LW3, DeviceInformation, DeviceType, VinxRuntimeData
 from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
+from custom_components.vinx.entity import VinxEntity
 
 _LOGGER = logging.getLogger(__name__)
 

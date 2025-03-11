@@ -6,7 +6,6 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceInfo, format_mac
-from homeassistant.helpers.entity import Entity
 from pylw3 import LW3
 
 from custom_components.vinx.const import DOMAIN
@@ -73,8 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         # Store runtime information
-        async with lw3.connection():
-            device_information = await get_device_information(lw3)
+        device_information = await get_device_information(lw3)
 
         # Store the lw3 as runtime data in the entry
         entry.runtime_data = VinxRuntimeData(lw3, device_information)
@@ -89,36 +87,3 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-
-
-class VinxEntity(Entity):
-    """
-    Base class for all entities, provides boilerplate for determining entity unique ID,
-    name and associating with the device.
-    """
-
-    def __init__(self, device_information: DeviceInformation, name: str, unique_id: str) -> None:
-        self._device_information = device_information
-        self._name = name
-        self._unique_id = unique_id
-
-    @property
-    def unique_id(self) -> str:
-        return f"vinx_{self._device_information.mac_address}_{self._unique_id}"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._device_information.device_info
-
-    @property
-    def name(self) -> str:
-        # Use increasingly less descriptive names depending on what information is available
-        device_label = self._device_information.device_label
-        serial_number = self._device_information.device_info.get("serial_number")
-
-        if device_label:
-            return f"{self._device_information.device_label} {self._name}"
-        elif serial_number:
-            return f"VINX {serial_number} {self._name}"
-        else:
-            return f"VINX {self._name}"
