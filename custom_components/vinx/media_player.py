@@ -15,13 +15,13 @@ from custom_components.vinx import DeviceInformation, DeviceType, VinxRuntimeDat
 from custom_components.vinx.const import EVENT_DISCOVER_SOURCES
 from custom_components.vinx.entity import VinxEntity
 
-_LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 async def async_setup_entry(_hass, entry, async_add_entities):
     # Extract stored runtime data
     runtime_data: VinxRuntimeData = entry.runtime_data
-    _LOGGER.info(f"Runtime data: {runtime_data}")
+    logger.info(f"Runtime data: {runtime_data}")
 
     # Add entity to Home Assistant
     device_type = runtime_data.device_information.get_device_type()
@@ -32,7 +32,7 @@ async def async_setup_entry(_hass, entry, async_add_entities):
         async_add_entities([VinxDecoder(runtime_data.lw3, runtime_data.device_information)])
         pass
     else:
-        _LOGGER.warning("Unknown device type, no entities will be added")
+        logger.warning("Unknown device type, no entities will be added")
 
 
 class AbstractVinxMediaPlayerEntity(VinxEntity, MediaPlayerEntity):
@@ -96,6 +96,7 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
                 signal_present = await self._lw3.get_property("/MEDIA/VIDEO/I1.SignalPresent")
                 self._state = MediaPlayerState.PLAYING if str(signal_present) == "1" else MediaPlayerState.IDLE
         except Exception:
+            logger.exception("An error occurred while updating the entity")
             self._attr_available = False
         else:
             self._attr_available = True
@@ -111,7 +112,7 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
         # Discard the event if it's not meant for us
         event_device_label = event.data.get("device_label")
         if event_device_label is None or event_device_label != self._device_information.device_label:
-            _LOGGER.debug(f"Discarding {EVENT_DISCOVER_SOURCES} event for device label {event_device_label}")
+            logger.debug(f"Discarding {EVENT_DISCOVER_SOURCES} event for device label {event_device_label}")
 
         # Ignore concurrent events
         if not self._update_sources_lock.locked():
@@ -132,4 +133,4 @@ class VinxDecoder(AbstractVinxMediaPlayerEntity):
                 video_channel_id = await self._lw3.get_property(f"{encoder_node.path}.VideoChannelId")
                 self._source_bidict.put(str(video_channel_id), str(device_name))
 
-        _LOGGER.info(f"{self.name} source list populated with {len(self.source_list)} sources")
+        logger.info(f"{self.name} source list populated with {len(self.source_list)} sources")

@@ -16,5 +16,6 @@
     "pylw3 @ git+https://github.com/NitorCreations/pylw3@0.2.1"
   ],
   "ssdp": [],
-  "zeroconf": ["_lwr3._tcp.local."]
+  "zeroconf": ["_lwr3._tcp.local."],
+  "loggers": ["pylw3"]
 }
