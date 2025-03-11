@@ -73,8 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         # Store runtime information
-        async with lw3.connection():
-            device_information = await get_device_information(lw3)
+        device_information = await get_device_information(lw3)
 
         # Store the lw3 as runtime data in the entry
         entry.runtime_data = VinxRuntimeData(lw3, device_information)
