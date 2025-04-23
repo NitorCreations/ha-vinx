@@ -4,7 +4,7 @@ version = "0.2.1"
 description = "Home Assistant integration for controlling Lightware VINX encoders and decoders"
 readme = "README.md"
 license = {file = "LICENSE"}
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "homeassistant",
     "bidict",
@@ -15,7 +15,7 @@ dependencies = [
 # https://github.com/astral-sh/ruff#configuration
 include = ["*.py", "*.pyi", "**/pyproject.toml"]
 extend-include = ["*.ipynb"]
-target-version = "py311"
+target-version = "py313"
 line-length = 120
 
 [tool.ruff.lint]
