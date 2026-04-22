@@ -1,6 +1,6 @@
 [project]
 name = "ha-vinx"
-version = "0.2.2"
+version = "0.2.3"
 description = "Home Assistant integration for controlling Lightware VINX encoders and decoders"
 readme = "README.md"
 license = {file = "LICENSE"}

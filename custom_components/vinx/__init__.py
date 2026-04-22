@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.device_registry import DeviceInfo, format_mac
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceInfo, format_mac
 from pylw3 import LW3
 
 from custom_components.vinx.const import DOMAIN
@@ -87,3 +87,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Allow removing a device via the UI.
+
+    Each config entry represents a single VINX unit identified by MAC. When a
+    unit is replaced, the previous MAC's device becomes orphaned; HA only
+    exposes a Delete button for it if the integration opts in here.
+    """
+    return True
